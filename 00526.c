@@ -1,5 +1,16 @@
 #include<stdio.h>
-#include<string.h>
+#include<stdlib.h>
+FILE *f;
+
+void printdp(int dp[][81],int n,int m)
+{int i,j;
+ for(i = 0;i<n;i++)
+{
+ for(j=0;j<m;j++){printf("%d ",dp[i][j]);}
+printf("\n");
+}
+
+}
 
 int trans(char s[], char t[], int dp[][81], int n, int m)
 {
@@ -52,10 +63,10 @@ void print_ans(char s[], char t[], int dp[][81], int n, int m, int& step,int &sl
   {
     for(i = 0; i < n; i++)
     {
-      printf("%d Delete %d\n",step,i+1);
+      printf("%d Delete 1\n",step);
       step++;
     }
-    slen = n;
+    slen = 1;
     return;
   }
   if(s[n-1] == t[m-1])
@@ -66,31 +77,28 @@ void print_ans(char s[], char t[], int dp[][81], int n, int m, int& step,int &sl
   else if(dp[n][m] == dp[n-1][m] + 1)
   {
     print_ans(s,t,dp,n-1,m,step,slen);
-    
-    printf("%d Delete %d\n",step,slen);slen--;
+    printf("%d Delete %d\n",step,slen);
+    slen--;
     step++;
   }
   else if(dp[n][m] == dp[n-1][m-1] + 1)
   {
     print_ans(s,t,dp,n-1,m-1,step,slen);
-    
-    printf("%d Replace %d,%c\n",step,slen,t[m-1]);slen++;
+    printf("%d Replace %d,%c\n",step,slen,t[m-1]);
+    slen++;
     step++;
   }
   else if(dp[n][m] == dp[n][m-1] + 1)
   {
     print_ans(s,t,dp,n,m-1,step,slen);
-    
-    printf("%d Insert %d,%c\n",step,slen,t[m-1]);slen++;
+    printf("%d Insert %d,%c\n",step,slen,t[m-1]);
+    slen++;
     step++;
   }
 }
 
-void Ans(char s[], char t[],int dp[][81])
+void Ans(char s[], char t[],int dp[][81], int n, int m)
 {
-  int n,m;
-  n = strlen(s);
-  m = strlen(t);
   int step = 1, slen = 0;
   printf("%d\n",trans(s,t,dp,n,m));
   print_ans(s,t,dp,n,m,step,slen);
@@ -99,21 +107,49 @@ void Ans(char s[], char t[],int dp[][81])
 
 int main()
 {
-  int i,j;
+  int i,j,m,n;
   char s[81],t[81];
   int dp[81][81];
-  
-  for(;scanf("%s",s) != EOF;)
+  char c;f = fopen("test","w");
+  for(;;)
   {
-    for(i = 0; i < 81; i++)
+    for(i = 0; i < 82; i++)
     {
-      for(j = 0; j < 81; j++)
+      if(scanf("%c",&c) == EOF)
       {
-        dp[i][j] = -1;
+        return 0;
+      }
+      if(c == '\n')
+      {
+        break;
+      }
+      s[i] = c;
+    }
+    s[i] = '\0';
+
+    for(j = 0; j < 82; j++)
+    {
+      if(scanf("%c",&c) == EOF)
+      {
+        return 0;
+      }
+      if(c == '\n')
+      {
+        break;
+      }
+      t[j] = c;
+    }
+    t[j] = '\0';
+    for(m = 0; m < i+1; m++)
+    {
+      for(n = 0; n < j+1; n++)
+      {
+        dp[m][n] = -1;
       }
     }
-    scanf("%s",t);
-    Ans(s,t,dp);
+    //printf("%d\n%d\n",i,j);
+    Ans(s,t,dp,i,j);
+    printf("\n");
   }
   return 0;
 }
