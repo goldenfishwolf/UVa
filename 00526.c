@@ -1,85 +1,173 @@
 #include<stdio.h>
 #include<stdlib.h>
-FILE *f;
 
-void printdp(int dp[][81],int n,int m)
-{int i,j;
- for(i = 0;i<n;i++)
+
+int dp[81][81];
+int redp[81][81];
+char s[81];
+char t[81];
+int n,m;
+
+
+void print(int d[][81],int n,int m)
 {
- for(j=0;j<m;j++){printf("%d ",dp[i][j]);}
+int i,j;
+for(i = 0 ; i <= n; i++)
+{
+for(j = 0; j <= m; j++)
+{
+printf("%d ",d[i][j]);
+}
 printf("\n");
 }
 
 }
 
-int trans(char s[], char t[], int dp[][81], int n, int m)
-{
-  if(n == 0 || m == 0)
-  {
-    dp[n][m] = n+m;
-    return n+m;
-  }
 
-  if(s[n-1] == t[m-1])
+int min(int a,int b)
+{
+  if(a < b)return a;
+  return b;
+}
+
+int trans(int x,int y)
+{
+
+
+  if(x == n)
   {
-    dp[n][m] = trans(s,t,dp,n-1,m-1);
+    return m-y;
+  }
+  if(y == m)
+  {
+    return n-x;
+  }
+  if(s[x] == t[y])
+  {
+    dp[x][y] = trans(x+1,y+1);
+    redp[x][y] = 0;
   }
   else
   {
-    int i,r,d;
-    i = trans(s,t,dp,n,m-1);
-    r = trans(s,t,dp,n-1,m-1);
-    d = trans(s,t,dp,n-1,m);
-    if(d <= r && d <= i)
+    int i,d,r;
+    r = trans(x+1,y+1);
+    d = trans(x+1,y);
+    i = trans(x,y+1);
+
+
+    dp[x][y] = min(min(i,d),r) + 1;
+    if(dp[x][y] == r + 1)
     {
-      dp[n][m] = d + 1;
+      redp[x][y] = 3;
     }
-    else if(r <= i && r <= d)
+    else if(dp[x][y] == d + 1)
     {
-      dp[n][m] = r + 1;
+      redp[x][y] = 2;
     }
     else
     {
-      dp[n][m] = i + 1;
+      redp[x][y] = 1;
+    }
+    
+  }
+  return dp[x][y];
+
+/*
+for(;;)
+{
+  if(s[x] == t[y])
+  {
+    dp[x][y] = trans(s,t,dp,redp,x+1,y+1,n,m);
+    redp[x][y] = 0;
+  }
+
+}*/
+
+
+  /*int x,y,tem;
+  for(x = 0; x <= n; x++)
+  {
+    for(y = 0; y <= m; y++)
+    {
+      if(s[x-1] == t[y-1])
+      {
+        dp[x][y] = dp[x-1][y-1];
+        redp[x][y] = 0;
+        continue;
+      }
+      if(x == 0 || y == 0)
+      {
+        dp[x][y] = x+y;
+        if(x == 0)
+        {
+          redp[x][y] = 1;//insert
+        }
+        else
+        {
+          redp[x][y] = 2;//delete
+        }
+        continue;
+      }
+      
+      dp[x][y] = 1 + min(min(dp[x-1][y],dp[x][y-1]),dp[x-1][y-1]);
+      if(dp[x][y] == dp[x][y-1] + 1)
+      {
+        redp[x][y] = 1;//insert
+      }
+      else if(dp[x][y] == dp[x-1][y] + 1)
+      {
+        redp[x][y] = 2;
+      }
+      else
+      {
+        redp[x][y] = 3;//replace
+      }
+      
     }
   }
-  return dp[n][m];
+
+  return dp[n][m];*/
+
 }
 
-void print_ans(char s[], char t[], int dp[][81], int n, int m, int& step,int &slen)
+void print_ans(int x, int y, int& step,int slen)
 {
-  int i;
-  if(n == 0)
+  int i,j,k;
+  /*for(i = 0; i < n; i++)
   {
-    for(i = 0; i < m; i++)
+    for(j = 0; j < m; j++)
     {
-      printf("%d Insert %d,%c\n",step,i+1,t[i]);
+      if(dp[i][j] == dp[i+1][j+1])
+      {
+        slen++;
+        i++;
+      }
+    }
+  }*/  step++;
+  if(x >= n)
+  {
+    for(; y < m; y++)
+    {
+      printf("%d Insert %d,%c\n",step,y+1,t[y]);
       step++;
     }
-    slen = m+1;
+    
     return;
   }
-  if(m == 0)
+  if(y >= m)
   {
-    for(i = 0; i < n; i++)
+    for(; x < n; x++)
     {
-      printf("%d Delete 1\n",step);
+      printf("%d Delete %d\n",step,x);
       step++;
     }
-    slen = 1;
     return;
   }
+  /*
   if(s[n-1] == t[m-1])
   {
     print_ans(s,t,dp,n-1,m-1,step,slen);
     slen++;
-  }
-  else if(dp[n][m] == dp[n-1][m] + 1)
-  {
-    print_ans(s,t,dp,n-1,m,step,slen);
-    printf("%d Delete %d\n",step,slen);
-    slen--;
-    step++;
   }
   else if(dp[n][m] == dp[n-1][m-1] + 1)
   {
@@ -95,25 +183,52 @@ void print_ans(char s[], char t[], int dp[][81], int n, int m, int& step,int &sl
     slen++;
     step++;
   }
+  else if(dp[n][m] == dp[n-1][m] + 1)
+  {
+    print_ans(s,t,dp,n-1,m,step,slen);
+    printf("%d Delete %d\n",step,slen);
+    step++;
+  }
+*/
+
+  switch(redp[x][y])
+  {
+    case 0:
+      step--;
+      print_ans(x+1,y+1,step,slen+1);
+      break;
+    case 1:
+      printf("%d Insert %d,%c\n",step,slen,t[y]);
+      print_ans(x,y+1,step,slen+1);
+      break;
+    case 2:
+      printf("%d Delete %d\n",step,slen);
+      print_ans(x+1,y,step,slen);
+
+      break;
+    case 3:
+      printf("%d Replace %d,%c\n",step,slen,t[y]);
+      print_ans(x+1,y+1,step,slen+1);
+      break;
+  }
+
 }
 
-void Ans(char s[], char t[],int dp[][81], int n, int m)
+void Ans()
 {
-  int step = 1, slen = 0;
-  printf("%d\n",trans(s,t,dp,n,m));
-  print_ans(s,t,dp,n,m,step,slen);
+  int step = 1, slen = 1;
+  printf("%d\n",trans(0,0));print(dp,n,m);printf("\n\n");print(redp,n,m);
+  print_ans(0,0,step,slen);
 }
 
 
 int main()
 {
-  int i,j,m,n;
-  char s[81],t[81];
-  int dp[81][81];
-  char c;f = fopen("test","w");
+  int i,j;
+  char c;
   for(;;)
   {
-    for(i = 0; i < 82; i++)
+    for(n = 0; n < 82; n++)
     {
       if(scanf("%c",&c) == EOF)
       {
@@ -123,11 +238,11 @@ int main()
       {
         break;
       }
-      s[i] = c;
+      s[n] = c;
     }
-    s[i] = '\0';
+    s[n] = '\0';
 
-    for(j = 0; j < 82; j++)
+    for(m = 0; m < 82; m++)
     {
       if(scanf("%c",&c) == EOF)
       {
@@ -137,18 +252,19 @@ int main()
       {
         break;
       }
-      t[j] = c;
+      t[m] = c;
     }
-    t[j] = '\0';
-    for(m = 0; m < i+1; m++)
+    t[m] = '\0';
+    for(i = 0; i < n+1; i++)
     {
-      for(n = 0; n < j+1; n++)
+      for(j = 0; j < m+1; j++)
       {
-        dp[m][n] = -1;
+        dp[i][j] = -1;
+        redp[i][j] = -1;
       }
     }
     //printf("%d\n%d\n",i,j);
-    Ans(s,t,dp,i,j);
+    Ans();
     printf("\n");
   }
   return 0;

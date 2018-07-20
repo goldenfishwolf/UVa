@@ -41,7 +41,7 @@ int check(int map[][4])
   return 0;
 }
 
-int all(int map[][4])
+int O(int map[][4],int xy[])
 {
   int i, j, n, m;
   for(i = 0; i < 4; i++)
@@ -51,32 +51,19 @@ int all(int map[][4])
       if(map[i][j] == 0)
       {
         map[i][j] = 2;
-        for(n = 0; n < 4; n++)
+        n = check(map);
+        if(n == -1)
         {
-          for(m = 0; m < 4; m++)
-          {
-            if(map[n][m] == 0)
-            {
-              map[n][m] = 1;
-              if(all(map) == 0)
-              {
-                //print(map);
-                map[n][m] = 0;
-                map[i][j] = 0;
-                return 0;
-              }
-              map[n][m] = 0;
-            }
-          }
+          ;
         }
-        map[i][j] = 0;
+        if(X(map,xy))
       }
     }
   }
   return check(map);
 }
 
-int ans(int map[][4], int xy[])
+int X(int map[][4], int xy[])
 {
   int i, j, n, m, flag = 0;
   for(i = 0; i < 4; i++)
