@@ -6,7 +6,7 @@ int dp[81][81];
 int redp[81][81];
 char s[81];
 char t[81];
-int n,m;
+int n,m,step;
 
 
 void print(int d[][81],int n,int m)
@@ -26,8 +26,7 @@ printf("\n");
 
 int min(int a,int b)
 {
-  if(a < b)return a;
-  return b;
+  return a<b?a:b;
 }
 
 int trans(int x,int y)
@@ -72,6 +71,7 @@ int trans(int x,int y)
   }
   return dp[x][y];
 
+
 /*
 for(;;)
 {
@@ -82,19 +82,14 @@ for(;;)
   }
 
 }*/
+/*
 
-
-  /*int x,y,tem;
+  int x,y,tem;
   for(x = 0; x <= n; x++)
   {
     for(y = 0; y <= m; y++)
     {
-      if(s[x-1] == t[y-1])
-      {
-        dp[x][y] = dp[x-1][y-1];
-        redp[x][y] = 0;
-        continue;
-      }
+
       if(x == 0 || y == 0)
       {
         dp[x][y] = x+y;
@@ -108,6 +103,13 @@ for(;;)
         }
         continue;
       }
+      if(s[x-1] == t[y-1])
+      {
+        dp[x][y] = dp[x-1][y-1];
+        redp[x][y] = 0;
+        continue;
+      }
+      
       
       dp[x][y] = 1 + min(min(dp[x-1][y],dp[x][y-1]),dp[x-1][y-1]);
       if(dp[x][y] == dp[x][y-1] + 1)
@@ -126,13 +128,55 @@ for(;;)
     }
   }
 
-  return dp[n][m];*/
-
+  return dp[n][m];
+*/
 }
 
-void print_ans(int x, int y, int& step,int slen)
+void print_ans(int x, int y,int slen)
 {
-  int i,j,k;
+  /*if(!x)
+  {
+    for(i = 0; i < y; i++)
+    {
+      printf("%d Insert %d,%c\n",step,i+1,t[i]);
+      step++;
+    }
+  }
+  if(!y)
+  {
+    for(i = 0; i < x; i++)
+    {
+      printf("%d Delete 1\n",step);
+      step++;
+    }
+    return;
+  }
+  step++;
+  switch(redp[x][y])
+  {
+    case 0:
+      step--;
+      print_ans(x-1,y-1,step,slen-1);
+      break;
+    case 1:
+      print_ans(x,y-1,step,slen-1);
+      printf("%d Insert %d,%c,%d,%d\n",step,slen,t[y-1],x,y);
+      break;
+    case 2:
+      
+      print_ans(x-1,y,step,slen-2);
+      printf("%d Delete %d\n",step,slen-1);
+      break;
+    case 3:
+      
+      print_ans(x-1,y-1,step,slen-1);
+      printf("%d Replace %d,%c\n",step,slen,t[y-1]);
+      break;
+  }*/
+
+
+
+  //int i,j,k;
   /*for(i = 0; i < n; i++)
   {
     for(j = 0; j < m; j++)
@@ -143,8 +187,26 @@ void print_ans(int x, int y, int& step,int slen)
         i++;
       }
     }
-  }*/  step++;
+  } */ 
+  step++;
   if(x >= n)
+  {
+    for(; y < m; y++,step++)
+    {
+      printf("%d Insert %d,%c\n",step,y+1,t[y]);
+    }
+    
+    return;
+  }
+  if(y >= m)
+  {
+    for(; x < n; x++,step++)
+    {
+      printf("%d Delete %d\n",step,x);
+    }
+    return;
+  }
+  /*if(x == 0)
   {
     for(; y < m; y++)
     {
@@ -154,7 +216,7 @@ void print_ans(int x, int y, int& step,int slen)
     
     return;
   }
-  if(y >= m)
+  if(y == 0)
   {
     for(; x < n; x++)
     {
@@ -162,63 +224,64 @@ void print_ans(int x, int y, int& step,int slen)
       step++;
     }
     return;
-  }
-  /*
+  }  
   if(s[n-1] == t[m-1])
   {
-    print_ans(s,t,dp,n-1,m-1,step,slen);
+    print_ans(n-1,m-1,step,slen);
     slen++;
   }
   else if(dp[n][m] == dp[n-1][m-1] + 1)
   {
-    print_ans(s,t,dp,n-1,m-1,step,slen);
+    print_ans(n-1,m-1,step,slen);
     printf("%d Replace %d,%c\n",step,slen,t[m-1]);
     slen++;
     step++;
   }
   else if(dp[n][m] == dp[n][m-1] + 1)
   {
-    print_ans(s,t,dp,n,m-1,step,slen);
+    print_ans(n,m-1,step,slen);
     printf("%d Insert %d,%c\n",step,slen,t[m-1]);
     slen++;
     step++;
   }
   else if(dp[n][m] == dp[n-1][m] + 1)
   {
-    print_ans(s,t,dp,n-1,m,step,slen);
+    print_ans(n-1,m,step,slen);
     printf("%d Delete %d\n",step,slen);
     step++;
-  }
-*/
+  }*/
 
-  switch(redp[x][y])
+
+  if(redp[x][y] == 0)
   {
-    case 0:
       step--;
-      print_ans(x+1,y+1,step,slen+1);
-      break;
-    case 1:
+      print_ans(x+1,y+1,slen+1);
+  }
+  else if(redp[x][y] == 1)
+  {
       printf("%d Insert %d,%c\n",step,slen,t[y]);
-      print_ans(x,y+1,step,slen+1);
-      break;
-    case 2:
-      printf("%d Delete %d\n",step,slen);
-      print_ans(x+1,y,step,slen);
+      print_ans(x,y+1,slen+1);
+  }
+  else if(redp[x][y] == 2)
+  {
+    printf("%d Delete %d\n",step,slen);
+      print_ans(x+1,y,slen);
 
-      break;
-    case 3:
-      printf("%d Replace %d,%c\n",step,slen,t[y]);
-      print_ans(x+1,y+1,step,slen+1);
-      break;
+  }
+  else if(redp[x][y] == 3)
+  {
+    printf("%d Replace %d,%c\n",step,slen,t[y]);
+      print_ans(x+1,y+1,slen+1);
+  
   }
 
 }
 
 void Ans()
 {
-  int step = 1, slen = 1;
-  printf("%d\n",trans(0,0));print(dp,n,m);printf("\n\n");print(redp,n,m);
-  print_ans(0,0,step,slen);
+  step = 0;
+  printf("%d\n",trans(0,0));//print(dp,n,m);printf("\n\n");print(redp,n,m);
+  print_ans(0,0,1);
 }
 
 
@@ -244,10 +307,7 @@ int main()
 
     for(m = 0; m < 82; m++)
     {
-      if(scanf("%c",&c) == EOF)
-      {
-        return 0;
-      }
+      scanf("%c",&c);
       if(c == '\n')
       {
         break;
@@ -264,7 +324,9 @@ int main()
       }
     }
     //printf("%d\n%d\n",i,j);
-    Ans();
+      step = 0;
+  printf("%d\n",trans(0,0));//print(dp,n,m);printf("\n\n");print(redp,n,m);
+  print_ans(0,0,1);
     printf("\n");
   }
   return 0;
